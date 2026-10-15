@@ -43,3 +43,6 @@ next-env.d.ts
 
 # lead capture (local storage for now)
 /leads/
+
+# local chat export
+/ai-log/
