@@ -24,3 +24,14 @@ export function resolveVariant(utmContent: string | string[] | null | undefined)
   const v = Array.isArray(utmContent) ? utmContent[0] : utmContent;
   return v === "hacek" ? "hacek" : "poplatek";
 }
+
+/** Same query the ad brief uses, so the landing headline matches this creative. */
+export function landingHref(variant: HeadlineVariant): string {
+  const params = new URLSearchParams({
+    utm_source: "meta",
+    utm_medium: "paid_social",
+    utm_campaign: "etf_kompas",
+    utm_content: variant,
+  });
+  return `/?${params.toString()}`;
+}

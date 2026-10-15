@@ -4,6 +4,13 @@ Jednostránkový web pro získání e-mailu. Výměnou za e-mail návštěvník 
 
 **Živě:** https://etf-landing-kompas.vercel.app/ · **Stack:** Next.js 16 (App Router), TypeScript, Tailwind v4, PostHog, Vercel
 
+**Náhledy reklam** (čtverec do feedu a stories na mobil). Klik otevře stránku s nadpisem, který reklama slibuje.
+
+- [Reklama A – Poplatek](https://etf-landing-kompas.vercel.app/reklama/poplatek), nadpis „Stejný index. Jiný poplatek.“
+- [Reklama B – Háček](https://etf-landing-kompas.vercel.app/reklama/hacek), nadpis „VOO si z Česka nekoupíte. Tohle ano.“
+
+Lokálně totéž na http://localhost:3000/reklama/poplatek a http://localhost:3000/reklama/hacek.
+
 ```bash
 npm install
 cp .env.example .env.local   # doplň NEXT_PUBLIC_POSTHOG_KEY
@@ -100,6 +107,7 @@ Metrika u všech: `lead_submitted / $pageview` (unikátní návštěvy). Při z�
 - `src/lib/fees.ts` – výpočet nákladů na poplatcích (měsíční vklady, TER aplikovaný na roční hrubý výnos).
 - `src/lib/variants.ts` – nadpisy podle reklamy.
 - `src/app/api/lead/route.ts` – endpoint pro leady.
+- `src/app/reklama/` – náhledy obou reklam (čtverec a stories), odkazují na landing se stejným nadpisem.
 - `docs/ads.md` – texty obou reklam.
 - `ai-log/` – export konverzace s AI, ve které projekt vznikl.
 
