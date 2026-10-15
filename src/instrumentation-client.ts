@@ -1,4 +1,5 @@
 import posthog from "posthog-js";
+import { resolveVariant } from "@/lib/variants";
 
 const key = process.env.NEXT_PUBLIC_POSTHOG_KEY;
 
@@ -14,6 +15,8 @@ if (key) {
     persistence: "memory",
     person_profiles: "identified_only",
     loaded: (ph) => {
+      // Every event carries the headline the visitor saw → funnel breakdown per ad.
+      ph.register({ headline_variant: resolveVariant(new URLSearchParams(location.search).get("utm_content")) });
       if (process.env.NODE_ENV === "development") ph.debug();
     },
   });

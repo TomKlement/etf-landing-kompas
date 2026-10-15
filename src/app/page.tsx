@@ -6,10 +6,13 @@ import { Objections } from "@/components/objections";
 import { StickyCta } from "@/components/sticky-cta";
 import { ETFS } from "@/data/etfs";
 import { formatDateCz } from "@/lib/fees";
+import { HEADLINES, resolveVariant } from "@/lib/variants";
 
 const DATA_DATE = "2026-10-15";
 
-export default function Home() {
+export default async function Home({ searchParams }: PageProps<"/">) {
+  const { utm_content } = await searchParams;
+  const headline = HEADLINES[resolveVariant(utm_content)];
   const usCount = ETFS.filter((e) => e.kind === "us").length;
   const ucitsCount = ETFS.length - usCount;
 
@@ -29,12 +32,12 @@ export default function Home() {
         {/* Hero – kept short so the comparator starts on the first mobile screen */}
         <section className="pt-4 pb-6 sm:pt-10 sm:pb-8">
           <h1 className="text-[34px] leading-[1.08] font-bold tracking-[-0.02em] sm:text-[48px]">
-            Stejný index.
+            {headline.lead}
             <br />
-            <span className="text-forest">Jiný poplatek.</span>
+            <span className="text-forest">{headline.accent}</span>
           </h1>
           <p className="mt-4 max-w-[34ch] text-[17px] leading-relaxed text-ink-2 sm:max-w-none sm:text-lg">
-            Porovnejte americké ETF, o kterých čtete, mezi sebou – a zjistěte, kterou verzi si z Česka opravdu koupíte.
+            {headline.sub}
           </p>
           <ul className="num mt-5 flex flex-wrap gap-x-4 gap-y-1.5 text-[13px] font-medium text-ink-2">
             <li className="flex items-center gap-1.5">
