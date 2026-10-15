@@ -127,4 +127,4 @@ Proměnné jsou v `.env.example`. Bez klíče je měření vypnuté. Eventy jdou
 Každý event nese `headline_variant` (poplatek / hacek).
 
 ### Aktualizace dat
-Zkontroluj TER na stránkách emitentů a v KID. Uprav čísla a `asOf` v `src/data/etfs.ts` a `DATA_DATE` v `src/app/page.tsx`. Pokud se změní TER fondů SPY nebo VOO, zkontroluj i text reklamy A.
+Data jsou aktuálníé k 15.10.2026 dle dostupných zdrojů
