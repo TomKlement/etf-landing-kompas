@@ -2,9 +2,11 @@ import { appendFile, mkdir } from "node:fs/promises";
 import path from "node:path";
 import { NextResponse } from "next/server";
 
-// Leads go to a local JSONL file for now. On Vercel the filesystem is ephemeral,
-// so set LEADS_DIR (e.g. /tmp) only for testing – swap for an ESP before launch.
-const LEADS_DIR = process.env.LEADS_DIR ?? path.join(process.cwd(), "leads");
+// Leads go to a local JSONL file for now. On Vercel only /tmp is writable and it is
+// wiped between invocations, so there each lead is also printed to the runtime log.
+// Swap for an ESP or a database before running paid traffic.
+const ON_VERCEL = Boolean(process.env.VERCEL);
+const LEADS_DIR = process.env.LEADS_DIR ?? (ON_VERCEL ? "/tmp/leads" : path.join(process.cwd(), "leads"));
 const LEADS_FILE = path.join(LEADS_DIR, "leads.jsonl");
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
@@ -47,11 +49,15 @@ export async function POST(req: Request) {
     userAgent: req.headers.get("user-agent")?.slice(0, 200) ?? null,
   };
 
+  if (ON_VERCEL) console.log("[lead]", JSON.stringify(record));
+
   try {
     await mkdir(LEADS_DIR, { recursive: true });
     await appendFile(LEADS_FILE, JSON.stringify(record) + "\n", "utf8");
   } catch (err) {
     console.error("lead write failed", err);
+    // The lead is already in the runtime log; don't punish the visitor for our storage.
+    if (ON_VERCEL) return NextResponse.json({ ok: true });
     return NextResponse.json(
       { ok: false, error: "Nepovedlo se uložit. Zkuste to prosím za chvíli." },
       { status: 500 },
