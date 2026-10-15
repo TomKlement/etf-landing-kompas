@@ -1,36 +1,23 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ETF Kompas – lead magnet landing page
 
-## Getting Started
-
-First, run the development server:
+One-page Next.js (App Router) + TypeScript + Tailwind v4 site. Single goal: collect an e-mail in exchange for the full US ETF → UCITS comparison and the "how to buy from Czechia" guide.
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Where things live
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- `src/data/etfs.ts` – every fund figure, with the issuer URL and as-of date (collected 2026-10-15). `null` means the issuer page didn't give a verifiable number; it's hidden, never estimated.
+- `src/data/sources.ts` – non-fund sources (PRIIPs, Czech tax law).
+- `src/lib/fees.ts` – fee-drag model (monthly contributions, TER applied on the annual gross return).
+- `src/app/api/lead/route.ts` – lead endpoint.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Leads
 
-## Learn More
+Leads are appended to `leads/leads.jsonl` (git-ignored). **This does not persist on Vercel**: its filesystem is read-only/ephemeral. Before going live, swap the `appendFile` call for an ESP (e.g. Ecomail) or a database. No e-mail is sent yet; the page unlocks the content instantly.
 
-To learn more about Next.js, take a look at the following resources:
+## Updating data
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Re-check TERs against the issuer pages/KIDs, update the figures and `asOf` dates in `src/data/etfs.ts` and `DATA_DATE` in `src/app/page.tsx`.

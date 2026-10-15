@@ -1,26 +1,96 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* Warm Bohemian Wealth – tokens from Design/warm_bohemian_wealth/DESIGN.md */
+@theme {
+  --color-canvas: #faf8f5;
+  --color-card: #ffffff;
+  --color-paper: #f1ece4;
+  --color-line: #e7e2da;
+  --color-line-strong: #d8d1c5;
+
+  --color-ink: #0f172a;
+  --color-ink-2: #475569;
+  --color-ink-3: #94a3b8;
+
+  --color-forest: #0f5a47;
+  --color-forest-deep: #0a4334;
+  --color-forest-soft: #e8f5f1;
+  --color-mint: #8ccfb7;
+
+  --color-amber: #d97706;
+  --color-amber-soft: #fdf3e6;
+  --color-loss: #b4432f;
+
+  --font-sans: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
+
+  --radius-btn: 8px;
+  --radius-card: 16px;
+  --radius-hero: 24px;
+
+  --shadow-l1: 0 2px 8px -2px rgb(27 38 59 / 0.04), 0 1px 3px rgb(27 38 59 / 0.02);
+  --shadow-l2: 0 10px 25px -4px rgb(27 38 59 / 0.07);
+  --shadow-l3: 0 20px 40px -8px rgb(27 38 59 / 0.12);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+}
+
+.num {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+/* Receipt edge – the zig-zag tear at the bottom of the fee "účtenka" */
+.receipt-edge {
+  --tooth: 10px;
+  mask:
+    conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) bottom / var(--tooth) 51% repeat-x,
+    linear-gradient(#000 0 0) top / 100% calc(100% - var(--tooth) / 2) no-repeat;
+}
+
+/* Collapses to 0fr until the element has data-open. */
+.reveal {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.5s ease;
+}
+
+.reveal > * {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.reveal[data-open] {
+  grid-template-rows: 1fr;
+}
+
+.dotted-leader {
+  background-image: radial-gradient(circle, var(--color-line-strong) 1px, transparent 1.2px);
+  background-size: 6px 6px;
+  background-position: 0 70%;
+  background-repeat: repeat-x;
+}
+
+input[type="range"] {
+  accent-color: var(--color-forest);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+    animation: none !important;
+  }
 }
