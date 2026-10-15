@@ -1,6 +1,7 @@
 "use client";
 
-import { useId, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
+import { track, trackOnce } from "@/lib/analytics";
 import { useLead } from "./lead-context";
 
 type Props = {
@@ -18,6 +19,23 @@ export function LeadForm({ placement, scenario, cta = "Pošlete mi celé srovná
   const [error, setError] = useState<string | null>(null);
   const id = useId();
   const dark = tone === "dark";
+  const formRef = useRef<HTMLFormElement>(null);
+
+  // "Viewed" = at least half of the form on screen, once per placement per page load.
+  useEffect(() => {
+    const form = formRef.current;
+    if (!form) return;
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        trackOnce(`form:${placement}`, "lead_form_viewed", { placement, scenario });
+        io.disconnect();
+      },
+      { threshold: 0.5 },
+    );
+    io.observe(form);
+    return () => io.disconnect();
+  }, [unlocked, placement, scenario]);
 
   if (unlocked) {
     return (
@@ -62,6 +80,7 @@ export function LeadForm({ placement, scenario, cta = "Pošlete mi celé srovná
       });
       const data = (await res.json()) as { ok: boolean; error?: string };
       if (!res.ok || !data.ok) throw new Error(data.error ?? "Nepovedlo se to.");
+      track("lead_submitted", { placement, scenario });
       unlock(email.trim().toLowerCase());
       requestAnimationFrame(() =>
         document.getElementById("z-ceska")?.scrollIntoView({ behavior: "smooth", block: "start" }),
@@ -73,7 +92,7 @@ export function LeadForm({ placement, scenario, cta = "Pošlete mi celé srovná
   }
 
   return (
-    <form onSubmit={onSubmit} noValidate className="space-y-3" aria-describedby={`${id}-note`}>
+    <form ref={formRef} onSubmit={onSubmit} noValidate className="space-y-3" aria-describedby={`${id}-note`}>
       <div className="flex flex-col gap-2 sm:flex-row">
         <label htmlFor={`${id}-email`} className="sr-only">
           E-mail

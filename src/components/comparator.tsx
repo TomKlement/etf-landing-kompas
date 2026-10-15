@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { ETFS, SCENARIOS, etfByTicker } from "@/data/etfs";
 import type { Etf, Scenario } from "@/data/types";
+import { trackOnce } from "@/lib/analytics";
 import { feeCost, formatCzk, formatPct } from "@/lib/fees";
 import { LeadForm } from "./lead-form";
 import { useLead } from "./lead-context";
@@ -20,6 +21,10 @@ export function Comparator() {
   const { unlocked } = useLead();
 
   const scenario = SCENARIOS.find((s) => s.id === scenarioId)!;
+
+  // First touch of any control counts as "interacted"; one event per page load keeps the funnel clean.
+  const interacted = (control: "scenario" | "monthly" | "years" | "return" | "custom_fund", next = scenarioId) =>
+    trackOnce("calculator", "calculator_interacted", { control, scenario: next });
 
   const funds: Etf[] = useMemo(() => {
     const tickers = scenarioId === "custom" ? [customA, customB] : scenario.us;
@@ -51,7 +56,10 @@ export function Comparator() {
               role="tab"
               aria-selected={active}
               aria-controls="srovnani-panel"
-              onClick={() => setScenarioId(s.id)}
+              onClick={() => {
+                setScenarioId(s.id);
+                interacted("scenario", s.id);
+              }}
               // 17px sits on the 24px shell once the 1px border and 6px inset are taken off.
               className={`rounded-[17px] px-1 py-2.5 text-[13px] font-semibold leading-tight transition sm:text-sm ${
                 active ? "bg-card text-ink shadow-l1" : "text-ink-2 hover:text-ink"
@@ -81,7 +89,10 @@ export function Comparator() {
                 <span className="text-xs font-semibold uppercase tracking-[0.05em] text-ink-3">{label}</span>
                 <select
                   value={value}
-                  onChange={(e) => set(e.target.value)}
+                  onChange={(e) => {
+                    set(e.target.value);
+                    interacted("custom_fund");
+                  }}
                   className="mt-1 h-12 w-full rounded-btn border border-line-strong bg-card px-3 text-[15px] font-semibold"
                 >
                   <optgroup label="Americké (z ČR nekoupíte)">
@@ -167,7 +178,10 @@ export function Comparator() {
             min={1000}
             max={50000}
             step={500}
-            onChange={setMonthly}
+            onChange={(v) => {
+              setMonthly(v);
+              interacted("monthly");
+            }}
           />
           <Slider
             label="Po dobu"
@@ -176,7 +190,10 @@ export function Comparator() {
             min={5}
             max={40}
             step={1}
-            onChange={setYears}
+            onChange={(v) => {
+              setYears(v);
+              interacted("years");
+            }}
           />
           <fieldset>
             <legend className="text-sm font-semibold text-ink">
@@ -188,7 +205,10 @@ export function Comparator() {
                   key={r}
                   type="button"
                   aria-pressed={gross === r}
-                  onClick={() => setGross(r)}
+                  onClick={() => {
+                    setGross(r);
+                    interacted("return");
+                  }}
                   className={`num h-10 flex-1 rounded-btn border text-sm font-semibold transition ${
                     gross === r
                       ? "border-forest bg-forest-soft text-forest-deep"
